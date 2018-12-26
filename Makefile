@@ -16,6 +16,7 @@ upload-bit: system.bit
 
 download-pic:
 	scp -r root@10.1.1.11:~/pic ./
+	rm -rf pic
 
 clean:
 	rm -rf send

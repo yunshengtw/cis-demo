@@ -17,7 +17,7 @@
 #define MAP_SIZE 0x10000
 #define MAP_MASK (MAP_SIZE-1)
 /* measured in ms */
-#define APPROX_FRAME_TIME 90
+#define APPROX_FRAME_TIME 100
 
 //global variable
 unsigned char pic[129][129] = {};
@@ -93,17 +93,19 @@ int main(int argc, char *argv[])
 
     int frame_num = 0;
     struct timeval start, end;
-    int tv_socket;
+    int tv_socket = 0;
     while(1)
     {
         gettimeofday(&start, NULL);
+
         set_enable();
         //usleep(1);
         set_disable();        
         while(get_trigger_val() == (unsigned int)0);
-        usleep((APPROX_FRAME_TIME - 20 - 7) * 1000);
+
+        usleep((APPROX_FRAME_TIME - 20) * 1000);
         
-#if 0
+#if 1
         set_enable();
         //usleep(1);
         set_disable();        
