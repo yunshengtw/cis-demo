@@ -20,7 +20,7 @@
 #define APPROX_FRAME_TIME 90
 
 //global variable
-unsigned int pic[129][129] = {};
+unsigned char pic[129][129] = {};
 int device_pointer;
 
 //used variable
@@ -41,6 +41,7 @@ void write_ppm(void);
 static int socket_init(char *host, int port)
 {
     int fd;
+    struct sockaddr_in server_addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == 0) {
@@ -48,7 +49,7 @@ static int socket_init(char *host, int port)
         exit(1);
     }
 
-  bzero((char *)&server_addr, sizeof(server_addr));
+    bzero((char *)&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     if (inet_pton(AF_INET, host, &server_addr.sin_addr) < 0) {
@@ -56,7 +57,7 @@ static int socket_init(char *host, int port)
         exit(1);
     }
 
-    if (connect(fd_socket, (struct sockaddr *)&server_addr,
+    if (connect(fd, (struct sockaddr *)&server_addr,
                 sizeof(server_addr)) < 0) {
         perror("connect error");
         exit(1);
@@ -77,7 +78,13 @@ int main(int argc, char *argv[])
     const int port = 8887;
     int fd_socket;
 
-    fd_socket = socket_init();
+    if (argc != 2) {
+        fprintf(stderr, "Usage: ./cis-driver <ip>\n");
+        exit(1);
+    }
+
+    host = argv[1];
+    fd_socket = socket_init(host, port);
     printf("Socket initilized.\n");
 
     printf("device init\n");
@@ -122,6 +129,16 @@ int main(int argc, char *argv[])
         }
         gettimeofday(&end, NULL);
         printf("%d ms\n", (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000);
+
+        static int cnt;
+        cnt++;
+        if (cnt == 10) {
+            //int amount = sizeof(pic);
+            //amount = htonl(amount);
+            //write(fd_socket, (char *)&amount, sizeof(amount));
+            write(fd_socket, pic, sizeof(pic));
+            exit(1);
+        }
 
         write_ppm() ;
     }
