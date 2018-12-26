@@ -56,7 +56,6 @@ static int socket_init(char *host, int port)
         perror("inet_pton error");
         exit(1);
     }
-
     if (connect(fd, (struct sockaddr *)&server_addr,
                 sizeof(server_addr)) < 0) {
         perror("connect error");
@@ -84,8 +83,7 @@ int main(int argc, char *argv[])
     }
 
     host = argv[1];
-    fd_socket = socket_init(host, port);
-    printf("Socket initilized.\n");
+    //printf("Socket initilized.\n");
 
     printf("device init\n");
     device_init();
@@ -95,6 +93,7 @@ int main(int argc, char *argv[])
 
     int frame_num = 0;
     struct timeval start, end;
+    int tv_socket;
     while(1)
     {
         gettimeofday(&start, NULL);
@@ -130,17 +129,25 @@ int main(int argc, char *argv[])
         gettimeofday(&end, NULL);
         printf("%d ms\n", (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000);
 
-        static int cnt;
-        cnt++;
-        if (cnt == 10) {
-            //int amount = sizeof(pic);
-            //amount = htonl(amount);
-            //write(fd_socket, (char *)&amount, sizeof(amount));
-            write(fd_socket, pic, sizeof(pic));
-            exit(1);
+        gettimeofday(&start, NULL);
+        fd_socket = socket_init(host, port);
+        write(fd_socket, pic, sizeof(pic));
+        close(fd_socket);
+        gettimeofday(&end, NULL);
+        tv_socket = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
+        printf("%d socket\n", tv_socket);
+#if 0
+        int byte_sent = 0;
+        while (byte_sent < sizeof(pic)) {
+            int amount = 1024;
+            if (sizeof(pic) - byte_sent < 1024)
+                amount = sizeof(pic) - byte_sent;
+            send(fd_socket, pic + byte_sent, amount, 0);
+            byte_sent += amount;
         }
+#endif
 
-        write_ppm() ;
+        //write_ppm() ;
     }
     return 0;
 }
