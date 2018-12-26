@@ -1,18 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
-    const char host[] = "127.0.0.1";
+    char *host;
     const int port = 8887;
     int fd_socket;
     char buf[56];
     struct sockaddr_in server_addr;
 
+    if (argc != 2) {
+        fprintf(stderr, "./recv <ip>\n");
+        return 1;
+    }
+
+    host = argv[1];
     memset(buf, 0, sizeof(buf));
     buf[0] = 10;
     buf[20] = 66;
