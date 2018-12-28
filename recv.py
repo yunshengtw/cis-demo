@@ -46,7 +46,6 @@ def animate(i):
             #print(h)
         print('Recv one image')
         img = np.flip(np.reshape(img, (129, 129)), axis=0)
-        print(img)
         display.set_data(img)
         return (display,)
         #plt.imsave('x.pdf', img)
